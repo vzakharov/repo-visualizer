@@ -1,7 +1,6 @@
 {
   "scripts": {
-    "build": "node_modules/.bin/esbuild --target=es2019 ./src/index.jsx --bundle --platform=node --outfile=index.js",
-    "prepare": "husky install",
+    "build": "node_modules/.bin/esbuild --target=es2019 ./src/index.jsx --bundle --platform=node --outfile=visualize.js",
     "typecheck": "yarn run tsc --noEmit --allowJs",
     "test:jest": "jest",
     "test:watch": "jest --watch",
@@ -22,7 +21,6 @@
   "devDependencies": {
     "@types/jest": "^27.0.1",
     "@types/micromatch": "^4.0.2",
-    "husky": "^7.0.0",
     "jest": "^27.0.6",
     "ts-jest": "^27.0.4",
     "typescript": "^4.3.5"
