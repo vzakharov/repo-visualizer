@@ -14,8 +14,16 @@ const main = async () => {
   const excludedPathsString = getInput("excluded_paths") || "node_modules,bower_components,dist,out,build,eject,.next,.netlify,.yarn,.git,.vscode,package-lock.json,yarn.lock"
   const excludedPaths = excludedPathsString.split(",").map(str => str.trim())
 
-  // Read excluded globs from .gitignore
-  const excludedGlobs = fs.readFileSync(`${rootPath}.gitignore`, 'utf8').split('\n').filter(line => line !== '' && !line.startsWith('#'));
+  // Read excluded globs from .gitignore, if it exists
+  const excludedGlobs = 
+    fs.existsSync(`${rootPath}.gitignore`)
+      ? fs.readFileSync(`${rootPath}.gitignore`, 'utf8').split('\n').filter(line => line !== '' && !line.startsWith('#')).map(line => `${rootPath}${line}`).map(line => line.replace(/\/$/, ''))
+      : getInput("excluded_globs")?.split(";") 
+      ?? []
+
+  console.log("Root path:", rootPath)
+  console.log("Excluded globs:", excludedGlobs)
+  // throw new Error()
 
   const data = await processDir(rootPath, excludedPaths, excludedGlobs);
 
@@ -23,7 +31,7 @@ const main = async () => {
     <Tree data={data} maxDepth={+maxDepth} colorEncoding={colorEncoding} customFileColors={customFileColors}/>
   );
 
-  const outputFile = getInput("output_file") || "./diagram.svg"
+  const outputFile = getInput("output_file") || `${rootPath}diagram.html`
 
   fs.writeFileSync(outputFile, componentCodeString)
 

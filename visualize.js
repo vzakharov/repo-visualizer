@@ -11422,14 +11422,9 @@ var import_micromatch = __toModule(require_micromatch());
 var shouldExcludePath = (path, pathsToIgnore, globsToIgnore) => {
   if (!path)
     return false;
-  return pathsToIgnore.has(path) || globsToIgnore.some((glob) => glob && (0, import_micromatch.isMatch)(processPath(path), glob, {
+  return pathsToIgnore.has(path) || globsToIgnore.some((glob) => glob && (0, import_micromatch.isMatch)(path, glob, {
     dot: true
   }));
-};
-var processPath = (path) => {
-  if (path.startsWith("./"))
-    return path.substring(2);
-  return path;
 };
 
 // src/process-dir.js
@@ -19185,13 +19180,16 @@ var getSortOrder = (item, cachedOrders, i = 0) => {
 
 // src/index.jsx
 var main = async () => {
+  var _a, _b;
   const rootPath = getInput("root_path") || "./";
   const maxDepth = getInput("max_depth") || 9;
   const customFileColors = JSON.parse(getInput("file_colors") || "{}");
   const colorEncoding = getInput("color_encoding") || "type";
   const excludedPathsString = getInput("excluded_paths") || "node_modules,bower_components,dist,out,build,eject,.next,.netlify,.yarn,.git,.vscode,package-lock.json,yarn.lock";
   const excludedPaths = excludedPathsString.split(",").map((str) => str.trim());
-  const excludedGlobs = import_fs2.default.readFileSync(`${rootPath}.gitignore`, "utf8").split("\n").filter((line) => line !== "" && !line.startsWith("#"));
+  const excludedGlobs = import_fs2.default.existsSync(`${rootPath}.gitignore`) ? import_fs2.default.readFileSync(`${rootPath}.gitignore`, "utf8").split("\n").filter((line) => line !== "" && !line.startsWith("#")).map((line) => `${rootPath}${line}`).map((line) => line.replace(/\/$/, "")) : (_b = (_a = getInput("excluded_globs")) == null ? void 0 : _a.split(";")) != null ? _b : [];
+  console.log("Root path:", rootPath);
+  console.log("Excluded globs:", excludedGlobs);
   const data = await processDir(rootPath, excludedPaths, excludedGlobs);
   const componentCodeString = import_server.default.renderToStaticMarkup(/* @__PURE__ */ import_react3.default.createElement(Tree, {
     data,
@@ -19199,7 +19197,7 @@ var main = async () => {
     colorEncoding,
     customFileColors
   }));
-  const outputFile = getInput("output_file") || "./diagram.svg";
+  const outputFile = getInput("output_file") || `${rootPath}diagram.html`;
   import_fs2.default.writeFileSync(outputFile, componentCodeString);
 };
 function getInput(name) {

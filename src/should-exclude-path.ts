@@ -16,14 +16,14 @@ export const shouldExcludePath = (
     globsToIgnore.some(
       (glob) =>
         glob &&
-        isMatch(processPath(path), glob, {
+        isMatch(path, glob, {
           dot: true,
         })
     )
   );
 };
 
-const processPath = (path: string): string => {
-  if (path.startsWith("./")) return path.substring(2);
-  return path;
-};
+// const processPath = (path: string): string => {
+//   if (path.startsWith("./")) return path.substring(2);
+//   return path;
+// };
